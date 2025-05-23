@@ -1,5 +1,5 @@
 const Model = require('./Model');
-const View = require('./View');
+const View = require('./view');
 const { EOL } = require('os');
 
 
