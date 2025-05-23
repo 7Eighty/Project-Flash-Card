@@ -1,56 +1,75 @@
-const fsp = require('fs').promises
+const fs = require('fs/promises');
 const { EOL } = require('os');
 
 class Model {
-    constructor(topicsName, userName){
-        this.topicsName = topicsName;
-        this.userName = userName;
-    }
+  constructor(topicName, userName) {
+    this.topicName = topicName;
+    this.userName = userName;
+  }
 
-    static async getTopicList(){
-        const arrFileName = await fsp.readdir('./topics');
-        const objTopic = {};
-        arrFileName.forEach((path) => {
-            const value = path.replace(/\.txt$/, '').replace(/_/g, ' ');
-            objTopic[value] = `./topics/${path}`;
-        });
+  static async getTopicList() {
+    const arrFileName = await fs.readdir('./topics');
+    const objTopic = {};
+    arrFileName.forEach((filePath) => {
+      const key = filePath.replace(/\.txt$/, '').replace(/_/g, ' ');
+      objTopic[key] = `./topics/${filePath}`;
+      
+    });
+ 
 
-    return objTopic
-    }
+    return objTopic;
+  }
+
+  async getArrayQuestion() {
+    const objFilesPath = await Model.getTopicList();
     
-    async getArrQuestion(){
-        const objFilesPath = await Model.getTopicList();
-        const choiseTopic = objFilesPath[this.topicsName.trim()]
-        
-        const cards = (await fsp.readFile(choiseTopic, 'utf8')).split(EOL + EOL).map(card => card.split(EOL))
+    const choiseTopicPath = objFilesPath[this.topicName.trim()];
 
-        const arrCard = [];
 
-        cards.forEach((card) => {
-            const cardObj = {};
-            [cardObj.question, cardObj.answers, cardObj.correctAnswer] = [
-                card[0],
-                card[1].split('/').map(answer => answer.trim()),
-                card[2],
-            ]
-            arrCard.push(cardObj)
-        })
-        
-        console.log(arrCard);
-    }   
+    const getCards = (await fs.readFile(choiseTopicPath, 'utf-8'))
+      .split(EOL + EOL)
+      .map((card) => card.split(EOL));
 
-    static async nextQuestion(arr, count = 0){
-        return arr[count]
-    }
+    const arrCardObjects = [];
+
+    getCards.forEach((card) => {
+      const cardObj = {};
+      [cardObj.question, cardObj.answers, cardObj.correctAnswer] = [
+        card[0],
+        card[1].split('/').map((el) => el.trim()),
+        card[2],
+      ];
+      arrCardObjects.push(cardObj);
+    });
     
+    return arrCardObjects;
+  }
 
-    static checkAnswer(correctAnswer, selectAnswer){
-        return correctAnswer === selectAnswer
-    }
+  static async apendGameInfo(data) {    
+  await fs.appendFile(`./gameStats.txt`, data)
+  }
 
-    static async appendGameInfo(data){
-        await fsp.appendFile('./gameStats.txt', data)
-    }
+  static getNextQuery(arr, num = 0) {
+    return arr[num];
+  }
+
+  static checkAnswer(correctAnswer, selectAnswer) {
+    return correctAnswer === selectAnswer
+  }
+
+  static getCorrect() {
+    const arr = ['Точно в цель!', 'Бинго!', 'Угадал(а)!', 'Так держать!', 'Попал(а) в точку!', 'Вот это да, красава!', 'Всё чётко!', 'Да ты гений!', 'Ай, молодца!'];
+    return `${arr[Math.floor(Math.random() * arr.length)]} лови 10 балоов `;
+  }
+
+  static getIncorrect() {
+    const arr = ['Мимо кассы!', 'Увы, не так.', 'Промахнулся(ась)!', 'Не угадал(а)!', 'Ошибочка вышла.', 'Хмм… не то.', 'Упс, нет!', 'Попробуй ещё раз!', 'Это был ложный след.', 'Ну почти… но нет.'];
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
 }
 
-module.exports = Model
+
+module.exports = Model;
+
+

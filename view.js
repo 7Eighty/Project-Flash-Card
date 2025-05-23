@@ -15,12 +15,12 @@ class View{
     })
   }
 
-  static askName(question, answer){
+  static askName(question){
     return inquirer.prompt({
       type: 'input',
       name: 'answer',
       message: question
-    })
+    });
   }
 
 }
