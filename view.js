@@ -1,26 +1,28 @@
-class View {
-  static getQuestionData(card) {
-    return {
-      question: card.question,
-      options: card.options.map((opt, index) => ({
-        number: index + 1,
-        text: opt
-      }))
-    };
+const inquirer = require('inquirer')
+const { EOL } = require('os');
+
+class View{
+  static render(arg){
+    console.log(arg + EOL);
   }
 
-  static getResultMessage(isCorrect) {
-    return isCorrect ? 'Правильно!' : 'Неправильно.';
+  static askQuestion(question, answer){
+    return inquirer.prompt({
+      type: 'rawlist',
+      name: 'answer',
+      message: question,
+      choices: answer
+    })
   }
 
-  static getFinalScore(score) {
-    return `Итоговый счёт: ${score}`;
+  static askName(question, answer){
+    return inquirer.prompt({
+      type: 'input',
+      name: 'answer',
+      message: question
+    })
   }
 
-  static getDeckList(card) {
-    return card.map((card, i) => ({
-      index: i + 1,
-      name: card
-    }));
-  }
 }
+
+module.exports = View

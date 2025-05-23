@@ -52,3 +52,5 @@ class Model {
         await fsp.appendFile('./gameStats.txt', data)
     }
 }
+
+module.exports = Model
